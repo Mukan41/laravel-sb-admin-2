@@ -70,6 +70,12 @@
                 <span>{{ __('About') }}</span>
             </a>
         </li>
+        <li class="nav-item {{ Nav::isRoute('users') }}">
+            <a class="nav-link" href="{{ route('users') }}">
+                <i class="fas fa-fw fa-hands-helping"></i>
+                <span>{{ __('Users') }}</span>
+            </a>
+        </li>
 
         <!-- Divider -->
         <hr class="sidebar-divider d-none d-md-block">
