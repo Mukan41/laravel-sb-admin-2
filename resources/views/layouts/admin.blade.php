@@ -70,10 +70,10 @@
                 <span>{{ __('About') }}</span>
             </a>
         </li>
-        <li class="nav-item {{ Nav::isRoute('users') }}">
-            <a class="nav-link" href="{{ route('users') }}">
+        <li class="nav-item {{ Nav::isRoute('customers') }}">
+            <a class="nav-link" href="{{ route('customers') }}">
                 <i class="fas fa-fw fa-hands-helping"></i>
-                <span>{{ __('Users') }}</span>
+                <span>{{ __('customers') }}</span>
             </a>
         </li>
 
@@ -335,5 +335,11 @@
 <script src="{{ asset('vendor/bootstrap/js/bootstrap.min.js') }}"></script>
 <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
 <script src="{{ asset('js/sb-admin-2.min.js') }}"></script>
+<!-- Page level plugins -->
+<script src="{{ asset('js/jquery.dataTables.min.js') }}"></script>
+<script src="{{ asset('js/dataTables.bootstrap4.min.js') }}"></script>
+
+<!-- Page level custom scripts -->
+<script src="{{ asset('js/datatables-demo.js') }}"></script>
 </body>
 </html>

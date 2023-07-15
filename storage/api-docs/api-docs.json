@@ -32,15 +32,6 @@
                         }
                     },
                     {
-                        "name": "role",
-                        "in": "query",
-                        "description": "Customer role",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
                         "name": "phone",
                         "in": "query",
                         "description": "Customer phone number",

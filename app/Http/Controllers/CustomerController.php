@@ -46,15 +46,6 @@ class CustomerController extends Controller
      *          )
      *      ),
      *      @OA\Parameter(
-     *          name="role",
-     *          in="query",
-     *          description="Customer role",
-     *          required=true,
-     *          @OA\Schema(
-     *              type="string",
-     *          )
-     *      ),
-     *      @OA\Parameter(
      *          name="phone",
      *          in="query",
      *          description="Customer phone number",
@@ -110,32 +101,31 @@ class CustomerController extends Controller
      */
     public function RegisterAPI(Request $request)
     {
-        $name=$request->name;
-        $role=$request->role;
-        $phone=$request->phone;
+        $name = $request->name;
+        $role = $request->role;
+        $phone = $request->phone;
         $email = $request->email;
         $password = $request->password;
 
         $validation = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
-            'role' => ['required', 'string', 'max:255'],
             'phone' => ['required', 'numeric', 'min:10', 'unique:' . Customer::class],
             'email' => ['required', 'email', 'max:255', 'unique:' . Customer::class],
-            'password' => ['required','string','regex:/[a-z]/','regex:/[A-Z]/','regex:/[0-9]/', 'regex:/[@$!%*#?&]/','min:8', 'max:255','confirmed']
+            'password' => ['required', 'string', 'regex:/[a-z]/', 'regex:/[A-Z]/', 'regex:/[0-9]/', 'regex:/[@$!%*#?&]/', 'min:8', 'max:255', 'confirmed']
         ]);
         if ($validation->fails()) {
-            return response()->json([$validation->errors()]);
-        }
-
-        elseif ($validation->passes()) {
+            return response()->json([
+                $validation->errors()
+            ], 422);
+        } elseif ($validation->passes()) {
             Customer::insert([
                 'name' => $name,
-                'role' => $role,
+                'role' => "customer",
                 'phone' => $phone,
                 'email' => $email,
                 'password' => Hash::make($password)
-            ]);
-            $customer =Customer::where(['email'=>$email])->first();
+            ], 200);
+            $customer = Customer::where(['email' => $email])->first();
             $customer["token"] = $customer->createToken('MyApp')->plainTextToken;
             return response()->json([$customer]);
         }
@@ -146,7 +136,8 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
-        //
+        $customers = Customer::all();
+        return view('users', ['customers' => $customers]);
     }
 
     /**
@@ -194,35 +185,36 @@ class CustomerController extends Controller
      */
 
 
-     // Login APIs
-    public function LoginAPI(Request $request){
+    // Login APIs
+    public function LoginAPI(Request $request)
+    {
 
 
-        
+
         $email = $request->email;
         $password = $request->password;
 
-        
-       $validation = Validator::make($request->all(),[
-                'email' => ['required','email', 'max:255'],
-                'password' => ['required', 'string', 'max:255']
-            ]);
+
+        $validation = Validator::make($request->all(), [
+            'email' => ['required', 'email', 'max:255'],
+            'password' => ['required', 'string', 'max:255']
+        ]);
         if ($validation->fails()) {
             return response()->json([$validation->errors()]);
         }
 
 
-        if ( Customer::where(['email'=>$email])->count()==0) {
-            return response()->json(["message"=>"email not match","data"=>null]);
+        if (Customer::where(['email' => $email])->count() == 0) {
+            return response()->json(["message" => "email not match", "data" => null]);
         }
-        $Customer = Customer::where(['email'=>$email])->first();
+        $Customer = Customer::where(['email' => $email])->first();
 
-        
+
         if (!Hash::check($password, $Customer->password)) {
-            return response()->json(["message"=>"password not match","data"=>null]);
+            return response()->json(["message" => "password not match", "data" => null]);
         }
         $Customer["token"] = $Customer->createToken('MyApp')->plainTextToken;
-            
+
 
         return response()->json([$Customer]);
     }
@@ -237,6 +229,24 @@ class CustomerController extends Controller
         //
     }
 
+    
+    /**
+     * Update the Status of customer.
+     */
+    public function updateStatus(Request $request, Customer $customer)
+    {
+        $customer = Customer::find($request->id);
+        if ($customer->status == 0) {
+            $customer->status = 1;
+        } else if ($customer->status == 1) {
+            $customer->status = 0;
+        }
+        $customer->save();
+
+        return response()->json(['message' => 'User status updated successfully.']);
+    }
+
+
     /**
      * Update the specified resource in storage.
      */
@@ -244,6 +254,16 @@ class CustomerController extends Controller
     {
         //
     }
+    /**
+     * Delete customer
+     */
+    public function delete(Request $request, Customer $customer)
+    {
+        $customer = Customer::find($request->id);
+        $customer->delete();
+        return response()->json(['message' => 'User deleted successfully.']);
+    }
+
 
     /**
      * Remove the specified resource from storage.
